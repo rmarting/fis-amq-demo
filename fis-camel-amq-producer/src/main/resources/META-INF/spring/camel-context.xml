@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+     Copyright 2005-2015 Red Hat, Inc.
+
+     Red Hat licenses this file to you under the Apache License, version
+     2.0 (the "License"); you may not use this file except in compliance
+     with the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <!-- Camel Properties -->
+    <bean id="properties" class="org.apache.camel.component.properties.PropertiesComponent">
+        <property name="location" value="classpath:/fis.properties"/>
+    </bean>     
+    <bean id="bridgePropertyPlaceholder" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:/fis.properties</value>
+            </list>
+        </property>
+    </bean>    
+
+    <!-- 
+    ${env:FIS_DEMO_CAMEL_AMQ_SERVICE_HOST:ide-host}
+    ${env:FIS_DEMO_CAMEL_AMQ_SERVICE_PORT:ide-port}
+    tcp://amqbroker-amq-tcp:61616
+    -->
+
+    <!-- ActiveMQ Producer Broker -->
+    <bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="${amq.producer.brokerURL}" />
+<!--         <property name="brokerURL" value="${env:FIS_DEMO_CAMEL_AMQ_SERVICE}" /> -->
+        <property name="userName" value="${amq.producer.userName}" />
+        <property name="password" value="${amq.producer.password}" />
+    </bean>
+
+    <!-- ActiveMQ Consumer Broker -->
+    <!--     
+    <bean id="activemq-consumer" class="org.apache.activemq.camel.component.ActiveMQComponent">
+        <property name="brokerURL" value="${amq.consumer.brokerURL}" />
+        <property name="userName" value="${amq.consumer.userName}" />
+        <property name="password" value="${amq.consumer.password}" />
+    </bean>
+    -->
+
+    <!-- Business Beans -->
+    <bean class="com.redhat.fis.amq.beans.IdGeneratorBean" id="generatorBean"/>
+
+    <!-- Error Handler -->
+    <bean class="org.apache.camel.builder.DeadLetterChannelBuilder" id="myDeadLetterErrorHandler">
+        <property name="deadLetterUri" value="activemq:queue:errors"/>
+        <property name="redeliveryPolicy" ref="myRedeliveryPolicyConfig"/>
+    </bean>
+    <bean class="org.apache.camel.processor.RedeliveryPolicy" id="myRedeliveryPolicyConfig">
+        <property name="maximumRedeliveries" value="1"/>
+        <property name="redeliveryDelay" value="10000"/>
+    </bean>
+    
+    <!-- Camel Contexts -->
+    <import resource="camel-context-amq-producer.xml" />
+
+</beans>
