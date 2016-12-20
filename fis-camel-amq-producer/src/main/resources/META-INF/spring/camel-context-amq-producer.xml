@@ -26,7 +26,7 @@
     <!-- Camel Context -->
     <camelContext id="camelContext-fis-amq-demo-amq-producer" xmlns="http://camel.apache.org/schema/spring">
         <route id="sendMessagetoQueueOne">
-            <from id="_from1" uri="timer:amq-producer?period=1s&amp;repeatCount=100"/>
+            <from id="_from1" uri="timer:amq-producer?period=5s&amp;repeatCount=100"/>
             <setBody id="_setBody1">
                 <method method="generateNewID" ref="generatorBean"/>
             </setBody>
