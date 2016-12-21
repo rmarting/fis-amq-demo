@@ -37,10 +37,9 @@
 
     <modules>
         <module>fis-camel-amq-producer</module>
-        <!-- 
-        <module>fis-camel-amq-consumer</module>
         <module>fis-camel-amq-forwarder</module>
-        -->
+        <module>fis-amq-client</module>
+<!--         <module>fis-camel-amq-consumer</module> -->
     </modules>
 
     <!--

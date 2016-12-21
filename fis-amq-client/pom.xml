@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.redhat.fis.amq</groupId>
+    <artifactId>fis-amq-client</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+	<packaging>jar</packaging>
+
+    <name>FIS :: AMQ :: Client :: Java</name>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jdk.target>1.7</jdk.target>
+	</properties>
+
+	<dependencies>
+		<!-- Java EE -->
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>javax.jms-api</artifactId>
+			<version>2.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- ActiveMQ -->
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-client</artifactId>
+			<version>5.11.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-kahadb-store</artifactId>
+			<version>5.11.1</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>fis-amq-client</finalName>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>${jdk.target}</source>
+					<target>${jdk.target}</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+        <profile>
+            <id>local-producer</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>com.redhat.fis.amq.client.MainProducer</mainClass>
+                            <arguments>
+                                <argument>vm://localhost</argument>
+                                <argument>TEST.AMQ</argument>
+                                <argument>admin</argument>
+                                <argument>admin</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>local-consumer</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>com.redhat.fis.amq.client.MainProducer</mainClass>
+                            <arguments>
+                                <argument>vm://localhost</argument>
+                                <argument>TEST.AMQ</argument>
+                                <argument>admin</argument>
+                                <argument>admin</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+		<profile>
+			<id>cdk-producer</id>
+
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<goals>
+									<goal>java</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<mainClass>com.redhat.fis.amq.client.MainProducer</mainClass>
+							<arguments>
+								<argument>failover:(ssl://amq-cons-amq-tcp-ssl-poc-amq.rhel-cdk.10.1.2.2.xip.io:443)?initialReconnectDelay=100&amp;maxReconnectAttempts=10&amp;maxReconnectDelay=10000&amp;warnAfterReconnectAttempts=5</argument>
+								<argument>consumer-external</argument>
+								<argument>amqconsumer</argument>
+								<argument>amqconsumer</argument>
+							</arguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+        <profile>
+            <id>cdk-consumer</id>
+
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <mainClass>com.redhat.fis.amq.client.MainConsumer</mainClass>
+                            <arguments>
+                                <argument>failover:(ssl://amq-cons-amq-tcp-ssl-poc-amq.rhel-cdk.10.1.2.2.xip.io:443)?initialReconnectDelay=100&amp;maxReconnectAttempts=10&amp;maxReconnectDelay=10000&amp;warnAfterReconnectAttempts=5</argument>
+                                <argument>consumer-external</argument>
+                                <argument>amqconsumer</argument>
+                                <argument>amqconsumer</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+	</profiles>
+</project>
